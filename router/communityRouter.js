@@ -6,6 +6,7 @@ const router = new express.Router();
 const auth = require("../auth/auth");
 const Task = require("../models/task.js");
 const User = require("../models/customer.js");
+const { populate } = require('../models/customer.js');
 app.use(express.json);
 
 router.post('/task/add', auth.userGuard, async (req, res) => {
@@ -112,6 +113,7 @@ router.put("/task/reward/:tid", auth.userGuard, async (req, res) => {
     const task = req.params.tid;
     const friend = req.user._id;
     const date_goal = new Date();
+    var inside;
     var date;
     date = date_goal.toISOString().slice(0, 10);
     console.log(date_goal);
@@ -125,20 +127,28 @@ router.put("/task/reward/:tid", auth.userGuard, async (req, res) => {
     catch {
         console.log("error");
     }
+    // for(let i=0;i<a.include_user.length;i++){
+    //     for(let o=0;o<a.include_user[i].account.length;o++){
+    //         console.log(friend.toString());
+    //         console.log(a.include_user[i].account[o].account_id);
+    //         if(friend == a.include_user[i].account[o].account_id){
+    //             console.log("aaaaa")
+    //             inside_id= a.include_user[i].account[o]._id;
+    //             console.log(inside_id);
+    //         }
+    //     }
+    // }
     for(let i=0;i<a.include_user.length;i++){
+        // console.log(a.include_user[0]._id)
         for(let o=0;o<a.include_user[i].account.length;o++){
-            console.log(friend.toString());
-            console.log(a.include_user[i].account[o].account_id);
-            if(friend == a.include_user[i].account[o].account_id){
+            if(friend.toString() == a.include_user[i].account[o].account_id){
                 console.log("aaaaa")
-                inside_id= a.include_user[i].account[o]._id;
-                console.log(inside_id);
+                inside= a.include_user[i].account[o]._id;
+                console.log(inside)
             }
+            
         }
-    }
-    for(let i=0;i<a.include_user.length;i++){
-        console.log(a.include_user[0]._id)
-        inc= a.include_user[0]._id;
+        
     }
     
     if (a.calorie_goals <= calorieCount && a.steps_goals <= stepsCount) {
@@ -170,28 +180,21 @@ router.put("/task/reward/:tid", auth.userGuard, async (req, res) => {
         for(let i =0 ; i<2;i++){
             console.log(a.include_user.account[i]._id.toString());
         }*/
-        Task.findOneAndUpdate({_id : task},{
-            $addToSet: {
-                "include_user.$[inc].random": "sadasdas"  
-              }
-            },
+        Task.findOneAndUpdate({_id:task},
             {
-              arrayFilters: [
-                {
-                  "inc._id": inc
-                // "q":0,
-                // "w":0
-                },
-              ]
-    },
-    )
-    //Task.findOne({include_user:{"$elemmatch":{account:{"$elemmatch":{"$in":[user]}}}}})
+                $set: {
+                  "include_user.$[].account.$[inside].date_goal": date_goal
+                }
+              },
+              {
+                arrayFilters: [
+                  { "inside._id": inside }, 
+                ]
+              }
+            )
         .then((data) => {
-            //if(data == "63d621dc98d0659151990a5d")
-            
                 // console.log(data);
-            
-            res.json({ success: true, msg: "Suiiiiiiii" })
+            res.json({ success: true, msg: "Success" })
         })
         .catch((e) => {
             res.json({ success: false, msg: e })
