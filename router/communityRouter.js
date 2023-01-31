@@ -118,6 +118,7 @@ router.put("/task/reward/:tid", auth.userGuard, async (req, res) => {
     date = date_goal.toISOString().slice(0, 10);
     console.log(date_goal);
     let a, b;
+    var inside_id;
     var validator = 0;
     var inc;
     try {
