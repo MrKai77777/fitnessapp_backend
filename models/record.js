@@ -18,8 +18,7 @@ const record = new mongoose.Schema({
             default : 0
         },
         date:{
-            type : Date,
-            deafult : new Date()
+            type : String
         }
     }],
     max_streaks:{
