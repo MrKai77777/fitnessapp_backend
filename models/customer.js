@@ -20,6 +20,7 @@ const customer = new mongoose.Schema({
     },
     age:{
         type : Number,
+        required : true
     },
     password : {
         type : String,
@@ -40,6 +41,18 @@ const customer = new mongoose.Schema({
     gender : {
         type : String,
         required : true
+    },
+    calorieIngested:{
+        type : Number,
+        default : 0
+    },
+    stepsWalked:{
+        type : Number,
+        default : 0
+    },
+    streaks:{
+        type : Number,
+        default : 0
     }
 
 });

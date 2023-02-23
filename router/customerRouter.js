@@ -110,6 +110,17 @@ router.post("/login", (req, res,next) => {
         
     });
 
+    router.delete("/deleteall", async (req, res) => {
+        customer.remove({}, function (err) {
+            if (err) {
+                res.json(err);
+            }
+            else {
+                res.json({ success: true, msg: "Data deleted" });
+            }
+        })
+    })
+
 
    /* app.listen(3000, () => {
         console.log('server running');

@@ -13,6 +13,8 @@ const calorieCounter = require("./router/calorie_counterRouter");
 app.use(calorieCounter);
 const task = require("./router/communityRouter");
 app.use(task);
+const recordData = require("./router/recordData");
+app.use(recordData);
  app.listen(3000, () => {
         console.log('server running');
     });

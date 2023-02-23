@@ -2,7 +2,7 @@ const express = require('express');
 const mongodb = require('mongoose');
 const app= express();
 const router = new express.Router();
-
+const auth = require("../auth/auth");
 const customer = require('../models/customer.js');
 app.use(express.json());
 
@@ -20,16 +20,12 @@ app.get('/', (req,res)=> {
     res.send ('Recommended Calories');
 });
 
-router.post('/calorie',(req,res)=>{
-    const email = req.body.email;
-    customer.findOne({ $or: [{email:email}]})
-    .then(user => {
-    if(user){
-    var age = user.age;
-    var gender = user.gender;
-    var weight = user.weight;
-    var height = user.height;
-    var activity;
+router.post('/calorie',auth.userGuard,(req,res)=>{  
+    var age = req.user.age;
+    var gender = req.user.gender;
+    var weight = req.user.weight;
+    var height = req.user.height;
+    var activity = "4";
     var totalCalories;  
 
     if (age === '' || weight === '' || height === '' || 80 < age || age< 15) {
@@ -59,11 +55,7 @@ router.post('/calorie',(req,res)=>{
       console.log('Calculating...');
       res.json(totalCalories);
     }
-    else{
-      res.json('no user found');
-    }
-    }); 
-  });
+  ); 
 
 //app.listen(3000, () => console.log ('listening on port 3000'));
 

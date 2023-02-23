@@ -68,17 +68,19 @@ router.post("/task/add_friend/:tid", auth.userGuard, async (req, res) => {
     catch {
         console.log("error");
     }
-    //console.log(c.firstname);
-    if (a.include_user.length > 0) {
+        // To assusre friends are not repeated
         for (let i = 0; i < a.include_user.length; i++) {
-            if (a.include_user[i].account == friend) {
-                b = "yes";
+            for(let o = 0 ; o<a.include_user[i].account.length;o++){
+                if (a.include_user[i].account[o].account_id == friend.toString()) {
+                    b = "yes";
+                }
+                else {
+                    b = "no";
+                }
             }
-            else {
-                b = "no";
             }
-        }
-    }
+            
+   
     if (b == "no" || b == null) {
         Task.findOneAndUpdate({ _id: task },
             {
@@ -128,24 +130,13 @@ router.put("/task/reward/:tid", auth.userGuard, async (req, res) => {
     catch {
         console.log("error");
     }
-    // for(let i=0;i<a.include_user.length;i++){
-    //     for(let o=0;o<a.include_user[i].account.length;o++){
-    //         console.log(friend.toString());
-    //         console.log(a.include_user[i].account[o].account_id);
-    //         if(friend == a.include_user[i].account[o].account_id){
-    //             console.log("aaaaa")
-    //             inside_id= a.include_user[i].account[o]._id;
-    //             console.log(inside_id);
-    //         }
-    //     }
-    // }
     for(let i=0;i<a.include_user.length;i++){
         // console.log(a.include_user[0]._id)
         for(let o=0;o<a.include_user[i].account.length;o++){
             if(friend.toString() == a.include_user[i].account[o].account_id){
-                console.log("aaaaa")
+                //console.log("aaaaa")
                 inside= a.include_user[i].account[o]._id;
-                console.log(inside)
+                //console.log(inside)
             }
             
         }
@@ -153,34 +144,6 @@ router.put("/task/reward/:tid", auth.userGuard, async (req, res) => {
     }
     
     if (a.calorie_goals <= calorieCount && a.steps_goals <= stepsCount) {
-
-       /* for (let i = 0; i < a.include_user.length; i++) {
-            if (a.include_user[i].account == user.toString()) {
-                validator = 1;
-
-            }
-        }
-        console.log(validator);*
-        if (validator == 1) {
-            Task.updateOne(
-                {
-                    account: user
-                },
-                { $addToSet: { "date_goal.$": date } }
-            )
-                .then(() => {
-                    res.json({ success: true, msg: "Suiiiiiiii" })
-                })
-                .catch((e) => {
-                    res.json({ success: false, msg: e })
-                })
-        }
-        else {
-            res.json({ success: false });
-        }
-        for(let i =0 ; i<2;i++){
-            console.log(a.include_user.account[i]._id.toString());
-        }*/
         Task.findOneAndUpdate({_id:task},
             {
                 $set: {
@@ -204,6 +167,71 @@ router.put("/task/reward/:tid", auth.userGuard, async (req, res) => {
     else {
         res.json({ success: false, msg: "Saddddddd" });
     }
+})
+
+router.put("/task/streaks/:tid",auth.userGuard,async (req,res)=>{
+    const today = new Date();
+    const task = req.params.tid;
+    var a;
+    var streaks = 0;
+    const friend = req.user._id
+    
+    try{
+        a = await Task.findOne({task : task})
+    } 
+    catch{
+        res.json({success : false, msg : "Wrong Task"})
+    }
+    //For the increment of streaks if one day has elapsed
+    for(let i = 0;i<a.include_user.length;i++){
+        for(let j = 0;j<a.include_user[i].account.length;j++){
+            if(a.include_user[i].account[j].account_id == friend.toString()){
+                streaks = a.include_user[i].account[j].streak;
+                //console.log(streaks);
+                var differenceDate = Math.abs(a.include_user[i].account[j].date_goal - today);
+                console.log(differenceDate);
+                if(differenceDate == 86400000){
+                    streaks++;
+                    //console.log(streaks);
+                }
+                //If task isnt completed
+                else if(differenceDate > 86400000){
+                    streaks = 0;
+                }
+            }
+        }
+    }
+    
+    //For User Id
+    for(let i=0;i<a.include_user.length;i++){
+        // console.log(a.include_user[0]._id)
+        for(let o=0;o<a.include_user[i].account.length;o++){
+            if(friend.toString() == a.include_user[i].account[o].account_id){
+                //console.log("aaaaa")
+                inside= a.include_user[i].account[o]._id;
+                //console.log(inside)
+            }
+            
+        }
+        
+    }
+    Task.findOneAndUpdate({_id : task},{
+        $set: {
+            "include_user.$[].account.$[inside].streak": streaks
+          }
+        },
+        {
+          arrayFilters: [
+            { "inside._id": inside }, 
+          ]
+    }
+)
+.then((data)=>{
+    res.json({success:true,msg : "Success"})
+})
+.catch((e)=>{
+    res.json({success:false,msg : e})
+})
 })
 
 router.delete("/task/deleteall", async (req, res) => {

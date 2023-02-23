@@ -38,6 +38,14 @@ const task = new mongodb.Schema({
         type:String,
         default:"asdasd"
     }
+    }],
+    max_streak:[{
+        m_firstname : {
+            type : String
+        },
+        max_streaks : {
+            type : Number
+        }
     }]
 })
 
