@@ -15,6 +15,8 @@ const task = require("./router/communityRouter");
 app.use(task);
 const recordData = require("./router/recordData");
 app.use(recordData);
+const goalsStreak = require("./router/goals_and_streaks");
+app.use(goalsStreak);
  app.listen(3000, () => {
         console.log('server running');
     });

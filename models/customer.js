@@ -7,8 +7,7 @@ const { StringDecoder } = require("string_decoder");
 const customer = new mongoose.Schema({
     firstname :{
         type: String,
-        required: true
-        
+        required: true 
     },
     lastname : {
         type : String,
@@ -53,8 +52,16 @@ const customer = new mongoose.Schema({
     streaks:{
         type : Number,
         default : 0
+    },
+    calorieGoal :{
+        type : Number
+    },
+    stepsGoal :{
+        type : Number
+    },
+    goalDate:{
+        type : Date
     }
-
 });
 
 module.exports = mongoose.model('customer_database',customer);
