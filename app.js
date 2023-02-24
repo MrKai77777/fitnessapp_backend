@@ -17,6 +17,8 @@ const recordData = require("./router/recordData");
 app.use(recordData);
 const goalsStreak = require("./router/goals_and_streaks");
 app.use(goalsStreak);
+const addfriend = require("./router/friendRouter");
+app.use(addfriend);
  app.listen(3000, () => {
         console.log('server running');
     });

@@ -45,8 +45,6 @@ router.post("/updateStreaks",auth.userGuard,async(req,res)=>{
         return;
     }
     var differenceDate = Math.abs(a.goalDate - today);
-    // console.log(a.goalDate);
-    // console.log(differenceDate);
     if(differenceDate == 86400000){
         if(calorieIngested >= calorieGoal && stepsWalked >= stepsGoal){
             User.findOneAndUpdate({_id : user},{
