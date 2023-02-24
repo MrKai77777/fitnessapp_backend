@@ -1,11 +1,15 @@
 const mongodb = require('mongoose');
 
-mongodb.connect('mongodb://127.0.0.1:27017/myapp', {
+const hosted = 'mongodb://uioivuamqumdxjrr546d:EybLxFdusRfUXVx0SV5f@n1-c2-mongodb-clevercloud-customers.services.clever-cloud.com:27017,n2-c2-mongodb-clevercloud-customers.services.clever-cloud.com:27017/bmfxqbckcpzxpgu?replicaSet=rs0'; 
+
+const local = 'mongodb://127.0.0.1:27017/myapp';
+
+mongodb.connect(hosted, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {
-    console.log('db connected');
+    console.log('Mongo DB connected');
 })
     .catch((err) => {
-        console.log('Error');
+        console.log('Mongo DB Error', err);
     });
