@@ -4,7 +4,7 @@ const hosted = 'mongodb://uioivuamqumdxjrr546d:EybLxFdusRfUXVx0SV5f@n1-c2-mongod
 
 const local = 'mongodb://127.0.0.1:27017/myapp';
 
-mongodb.connect(local, {
+mongodb.connect(hosted, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {
