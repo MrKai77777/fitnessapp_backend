@@ -11,10 +11,11 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-
+const auth = require("../auth/auth");
 const customer = require('../models/customer.js');
 const { Router } = require('express');
 const { default: mongoose } = require('mongoose');
+const { custom } = require("joi");
 
 /*mongodb.connect('mongodb://127.0.0.1:27017/myapp', {
     useNewUrlParser: true,
@@ -109,6 +110,35 @@ router.post("/login", (req, res,next) => {
         } )
         
     });
+
+    router.post("/editProfile",auth.userGuard,async(req,res)=>{
+        const height = req.body.height;
+        const weight = req.body.weight;
+        const user_name = req.body.username;
+        const user = req.user._id;
+        customer.findOneAndUpdate({_id : user}),{
+            $set:{
+                user_name : user_name,
+                weight : weight,
+                height : height
+            }
+            .then(()=>{
+                res.json({msg:"Changes Completed",success : true});
+            })
+            .catch((e)=>{
+                res.json({msg:e ,success : false});
+            })
+        }
+    })
+
+    router.get("/showUser",auth.userGuard, (req, res) => {
+        const user = req.user._id;
+        customer.findOne({_id : user})
+            .then((data) => {
+                // console.log(data);
+                res.json({ data: data })
+            })
+    })
 
     router.delete("/deleteall", async (req, res) => {
         customer.remove({}, function (err) {

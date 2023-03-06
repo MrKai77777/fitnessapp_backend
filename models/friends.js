@@ -15,6 +15,9 @@ const friends = new mongoose.Schema({
         },
         friend_name :{
             type : String
+        },
+        streaks:{
+            type : Number
         }
     }]
 })

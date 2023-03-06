@@ -46,6 +46,8 @@ router.post("/addFriends",auth.userGuard,async(req,res)=>{
     }
     const user_name = req.user.firstname;
     const friend_name = a.firstname;
+    const friend_streaks = a.streaks;
+    const user_streaks = req.user.streaks
 
     for(let i = 0; i < b.friend_list.length;i++){
         if(b.friend_list[i].friend_id == friend.toString()){
@@ -62,7 +64,8 @@ router.post("/addFriends",auth.userGuard,async(req,res)=>{
                 $addToSet: {
                     friend_list:[{
                         friend_id : friend,
-                        friend_name : friend_name
+                        friend_name : friend_name,
+                        streaks : friend_streaks
                     }]
                 }
             })
@@ -72,7 +75,8 @@ router.post("/addFriends",auth.userGuard,async(req,res)=>{
             $addToSet: {
                 friend_list:[{
                     friend_id : user,
-                    friend_name : user_name
+                    friend_name : user_name,
+                    streaks : user_streaks
                 }]
             }
         })
@@ -96,6 +100,15 @@ router.post("/addFriends",auth.userGuard,async(req,res)=>{
 router.get("/friend/show", (req, res) => {
     Friends.find()
         .then((data) => {
+            res.json({ data: data })
+        })
+})
+
+router.get("/friend/showUserFriend",auth.userGuard, (req, res) => {
+    const user = req.user._id;
+    Friends.findOne({account_id : user})
+        .then((data) => {
+            // console.log(data);
             res.json({ data: data })
         })
 })
