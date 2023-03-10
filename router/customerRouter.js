@@ -116,20 +116,20 @@ router.post("/login", (req, res,next) => {
         const weight = req.body.weight;
         const user_name = req.body.username;
         const user = req.user._id;
-        customer.findOneAndUpdate({_id : user}),{
+        customer.findOneAndUpdate({_id : user},{
             $set:{
-                user_name : user_name,
+                username : user_name,
                 weight : weight,
                 height : height
             }
-            .then(()=>{
+        })
+            .then((data)=>{
                 res.json({msg:"Changes Completed",success : true});
             })
             .catch((e)=>{
                 res.json({msg:e ,success : false});
             })
-        }
-    })
+        })
 
     router.get("/showUser",auth.userGuard, (req, res) => {
         const user = req.user._id;
