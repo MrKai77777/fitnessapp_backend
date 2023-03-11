@@ -54,25 +54,33 @@ router.get("/task/show", (req, res) => {
         })
 })
 
+router.get("/task/showTask", (req, res) => {
+    const group = req.body.group;
+    Task.findOne({_id : group})
+        .then((data) => {
+            res.json({ data: data })
+        })
+})
+
 router.post("/task/joinGroup",auth.userGuard,async(req,res)=>{
     const group = req.body.group;
     const user = req.user._id;
     const user_firstname = req.user.firstname;
     const user_username = req.user.username;
-    let a;user_firstname 
+    let a;
     var b;
     let c;
     try{
-        a = await Task.findOne({ _id: task });
+        a = await Task.findOne({ _id: group });
         //console.log(a.include_user);
-        c = await User.findOne({ _id: friend })
+        //c = await User.findOne({ _id: friend })
     }
     catch{
         console.log("error");
     }
     for (let i = 0; i < a.include_user.length; i++) {
         for(let o = 0 ; o<a.include_user[i].account.length;o++){
-            if (a.include_user[i].account[o].account_id == friend.toString()) {
+            if (a.include_user[i].account[o].account_id == user.toString()) {
                 b = "yes";
             }
             else {
@@ -83,7 +91,7 @@ router.post("/task/joinGroup",auth.userGuard,async(req,res)=>{
         
 
 if (b == "no" || b == null) {
-    Task.findOneAndUpdate({ _id: task },
+    Task.findOneAndUpdate({ _id: group },
         {
             $addToSet: {
                 include_user: [
