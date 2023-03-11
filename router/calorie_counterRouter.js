@@ -49,26 +49,35 @@ router.post('/counter', auth.userGuard, async (req, res) => {
 
 router.post('/calorieReset', auth.userGuard, async (req, res) => {
     const user = req.user._id;
-    const currentDate = new Date();
-
-    // Set the time to 12AM
-    currentDate.setHours(0, 0, 0, 0);
-
-    // Add one day to the date
-    currentDate.setDate(currentDate.getDate() + 1);
+    const currentDate = new Date().toISOString().substring(0,10);
+    var a;
+    try{
+        a = await User.findOne({_id : user}) ;
+    }
+    catch{
+        console.log("Error In Finding the User");
+    }
+    
+    const previousDate = a.goalDate;
+    console.log(previousDate.toISOString().substring(0,10));
+    console.log(currentDate);
 
     // Check if it is now 12AM in the next day
-    if (new Date() >= currentDate) {
+    if (previousDate.toISOString().substring(0,10) != currentDate) {
         User.findOneAndUpdate({ _id: user },
             {
                 $set: {
-                    "calorieIngested": 0
+                    "calorieIngested": 0,
+                    "stepsWalked" : 0,
+                    "goalDate" : currentDate
+                },
+                $inc :{
+                    "streaks" : 1
                 }
             }
         )
             .then((data) => {
                 // console.log(data);
-                currentDate.setDate(currentDate.getDate() + 1);
                 res.json({ success: true, msg: "Success" })
             })
             .catch((e) => {
@@ -77,6 +86,7 @@ router.post('/calorieReset', auth.userGuard, async (req, res) => {
     } 
     else {
         console.log('It is not yet 12AM in the next day');
+        res.json({success : false, msg : "Its not 12 AM next Day"});
     }
 })
 

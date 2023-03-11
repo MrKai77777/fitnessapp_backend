@@ -10,7 +10,8 @@ router.post("/addGoals",auth.userGuard,async(req,res)=>{
     const user = req.user._id;
     const calorieGoal = req.body.calorieGoal;
     const stepsGoal = req.body.stepsGoal;
-    const today = new Date;
+    const today = new Date().toISOString().substring(0,10);
+    console.log(today);
     User.findOneAndUpdate({_id : user},{
         $set:{
             calorieGoal : calorieGoal,

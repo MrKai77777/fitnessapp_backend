@@ -24,6 +24,14 @@ const record = new mongoose.Schema({
     max_streaks:{
         type : Number,
         default : 0
+    },
+    averageSteps:{
+        type : Number,
+        default : 0
+    },
+    averageCalories :{
+        type : Number,
+        default : 0
     }
 })
 module.exports = mongoose.model("Record_Data", record);

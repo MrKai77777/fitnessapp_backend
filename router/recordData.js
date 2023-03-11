@@ -46,6 +46,10 @@ router.post('/recordData/:rid',auth.userGuard,async(req,res)=>{
     const calories = req.user.calorieIngested;
     const steps = req.user.stepsWalked;
     const streak = req.user.streaks;
+    var totalCalories = 0;
+    var totalSteps = 0;
+    var averageCalories = 0;
+    var averageSteps = 0;
     var a;
     var validate = 0;
     var inside;
@@ -56,15 +60,22 @@ router.post('/recordData/:rid',auth.userGuard,async(req,res)=>{
     catch{
         res.json({success:false, msg:"No record found"});
     }
+    var total_days = a.progress.length;
 
     if(a.account_id == user.toString()){
         for(let i = 0 ;i<a.progress.length;i++){
             if(a.progress[i].date == today){
                 validate = 1;
                 inside = a.progress[i]._id;
+                // console.log(a.progress[i].calorie/2);
+                // console.log(total_days);
             }
+                 totalCalories = Math.abs((totalCalories + a.progress[i].calorie));
+                 totalSteps = Math.abs((totalSteps + a.progress[i].steps));
         }
     }
+    averageCalories = totalCalories/total_days;
+    averageSteps = totalSteps/total_days;
 
     if(validate == 1){
         Record.findOneAndUpdate({_id : record},{
@@ -80,10 +91,22 @@ router.post('/recordData/:rid',auth.userGuard,async(req,res)=>{
           }
         )
         .then(()=>{
-            res.json({success : true,msg:"Record Updated"});
+            Record.findOneAndUpdate({_id : record},{
+                $set:{
+                     "averageCalories" : parseInt(averageCalories),
+                     "averageSteps" : parseInt(averageSteps)
+                }
+            })
+            .then(()=>{
+                res.json({success : true,msg:"Record Updated"});
         })
         .catch((e)=>{
             res.json({success : false,msg: e });
+        })
+            })
+            
+        .catch((e)=>{
+            res.json({success : false,msg: "e" });
         })
     }
     else{
@@ -100,7 +123,7 @@ router.post('/recordData/:rid',auth.userGuard,async(req,res)=>{
             res.json({success : true,msg:"New Record Created"});
         })
         .catch((e)=>{
-            res.json({success : false,msg: e });
+            res.json({success : false,msg: "Record Already Updated" });
         })
     }
  })
