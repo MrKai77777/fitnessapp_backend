@@ -135,6 +135,14 @@ router.post('/recordData/:rid',auth.userGuard,async(req,res)=>{
         })
 })
 
+router.get("/record/showUser", auth.userGuard,async(req, res) => {
+    const user = req.user._id;
+    Record.find({account_id : user})
+        .then((data) => {
+            res.json({ data: data })
+        })
+})
+
 router.delete("/record/deleteall", async (req, res) => {
     Record.remove({}, function (err) {
         if (err) {
