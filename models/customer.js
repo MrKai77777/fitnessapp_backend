@@ -54,13 +54,20 @@ const customer = new mongoose.Schema({
         default : 0
     },
     calorieGoal :{
-        type : Number
+        type : Number,
+        default : 0
     },
     stepsGoal :{
-        type : Number
+        type : Number,
+        default : 0
     },
     goalDate:{
-        type : Date
+        type : Date,
+        default : new Date().toISOString().substring(0,10)
+    },
+    recommendedCalories:{
+        type : Number,
+        default : 0
     }
 });
 

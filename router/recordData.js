@@ -12,7 +12,7 @@ router.post('/record/enter',auth.userGuard,async(req,res)=>{
     Record.findOne({account_id : user})
     .then((data)=>{
         if(data){
-            res.json({ msg: "Record already exists" });
+            res.json({ success : true , msg: "Record already exists" });
             return;
         }
         const firstname = req.user.firstname;
@@ -33,7 +33,7 @@ router.post('/record/enter',auth.userGuard,async(req,res)=>{
         res.json({success :true , msg:"record saved"});
     })
     .catch((e)=>{
-        res.json({success :true , msg: e});
+        res.json({success :false , msg: e});
     })
     })
     
@@ -120,12 +120,24 @@ router.post('/recordData',auth.userGuard,async(req,res)=>{
             }
         })
         .then(()=>{
-            res.json({success : true,msg:"New Record Created"});
+            Record.findOneAndUpdate({account_id : user},{
+                $set:{
+                     "averageCalories" : parseInt(averageCalories),
+                     "averageSteps" : parseInt(averageSteps)
+                }
+            })
+                .then(()=>{
+                    res.json({success : true,msg:"New Record Created"});
+                })
+                .catch((e)=>{
+                    res.json({success : false,msg: "Record Already Updated" });
+                })
+            
         })
         .catch((e)=>{
             res.json({success : false,msg: "Record Already Updated" });
         })
-    }
+        }
  })
 
  router.get("/record/show", (req, res) => {

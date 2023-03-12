@@ -6,9 +6,14 @@ const app = express();
 const router = new express.Router();
 const User = require("../models/customer.js");
 const food = require('../models/food.js');
+const dailyfood = require("../models/dailyfood");
 app.use(express.json());
 
 var sum;
+
+// router.post('/createDBCounter',auth.userGuard,async(req,res)=>{
+//     const user = req.user._id;
+// });
 
 router.post('/counter', auth.userGuard, async (req, res) => {
     const user = req.user._id;
@@ -20,31 +25,61 @@ router.post('/counter', auth.userGuard, async (req, res) => {
     catch {
         console.log("invalid");
     }
-    const sauceName = req.body.sauceName;
-    food.findOne({ sauceName: sauceName })
-        .then(sauce_data => {
-            console.log(sauce_data.calories);
-            sum = a.calorieIngested + sauce_data.calories;
-            console.log(sum);
-            User.findOneAndUpdate({ _id: user },
-                {
-                    $set: {
-                        "calorieIngested": sum
-                    }
-                }
-            )
-                .then((data) => {
-                    // console.log(data);
-                    res.json({ success: true, msg: "Success" })
+    dailyfood.findOne({account_id : user})
+    .then((data)=>{
+        if(data){
+            const sauceName = req.body.sauceName;
+            food.findOne({ sauceName: sauceName })
+                .then(sauce_data => {
+                    console.log(sauce_data.calories);
+                    sum = a.calorieIngested + sauce_data.calories;
+                    console.log(sum);
+                    User.findOneAndUpdate({ _id: user },
+                        {
+                            $set: {
+                                "calorieIngested": sum
+                            }
+                        }
+                    )
+                    dailyfood.findOneAndUpdate({account_id : user},{
+                        $addToSet:{
+                            foodIngested:[{
+                                sauceName : sauceName,
+                                calories : sauce_data.calories
+                            }]
+                        }
+                    })
+        
+                        .then((data) => {
+                            // console.log(data);
+                            res.json({ success: true, msg: "Success" })
+                        })
+                        .catch((e) => {
+                            res.json({ success: false, msg: e })
+                        })
                 })
                 .catch((e) => {
-                    res.json({ success: false, msg: e })
-                })
-        })
-        .catch((e) => {
-            res.json({ success: false, msg: e });
+                    res.json({ success: false, msg: e });
+                }
+                )
         }
-        )
+        else{
+            const record_food = new dailyfood({
+                account_id : user
+            })
+            record_food.save()
+            .then(()=>{
+                res.json({success : true,msg:"New data Created"})
+            })
+            .catch((e)=>{
+                res.json({success : false,msg:e})
+            })
+        }
+    })
+    .catch(()=>{
+        res.json({success : false,msg:e})
+    })
+    
 });
 
 router.post('/calorieReset', auth.userGuard, async (req, res) => {
@@ -116,6 +151,14 @@ router.post('/calorieReset', auth.userGuard, async (req, res) => {
         console.log('It is not yet 12AM in the next day');
         res.json({success : false, msg : "Its not 12 AM next Day"});
     }
+})
+
+router.get("/calorie/showUser", auth.userGuard,async(req, res) => {
+    const user = req.user._id;
+    dailyfood.find({account_id : user})
+        .then((data) => {
+            res.json({ data: data })
+        })
 })
 
 module.exports = router;

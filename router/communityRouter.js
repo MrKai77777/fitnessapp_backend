@@ -62,6 +62,14 @@ router.get("/task/showTask", (req, res) => {
         })
 })
 
+router.get("/task/showUserTask", (req, res) => {
+    const user = req.user._id;
+    Task.findOne({_id : group})
+        .then((data) => {
+            res.json({ data: data })
+        })
+})
+
 router.post("/task/joinGroup",auth.userGuard,async(req,res)=>{
     const group = req.body.group;
     const user = req.user._id;

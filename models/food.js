@@ -15,7 +15,7 @@ const food = new mongodb.Schema({
     },
     resturantNames:{
         type: String,
-        requied : true
+        //requied : true
     }
 });
 

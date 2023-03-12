@@ -21,6 +21,7 @@ app.get('/', (req,res)=> {
 });
 
 router.post('/calorie',auth.userGuard,(req,res)=>{  
+    const user = req.user._id;
     var age = req.user.age;
     var gender = req.user.gender;
     var weight = req.user.weight;
@@ -53,7 +54,17 @@ router.post('/calorie',auth.userGuard,(req,res)=>{
         totalCalories = 1.9 * (655 + (9.563 * parseFloat(weight)) + (1.850 * parseFloat(height)) - (4.676 * parseFloat(age)));
       } 
       console.log('Calculating...');
-      res.json(totalCalories);
+      customer.findOneAndUpdate({_id : user},{
+        $set:{
+          recommendedCalories : parseInt(totalCalories)
+        }
+      })
+      .then(()=>{
+        res.json({success : true , msg :"Data Added"});
+      })
+      .catch((e)=>{
+        res.json({success : false , msg : e});
+      })
     }
   ); 
 
