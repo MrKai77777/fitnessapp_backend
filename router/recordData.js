@@ -39,8 +39,8 @@ router.post('/record/enter',auth.userGuard,async(req,res)=>{
     
 })
 
-router.post('/recordData/:rid',auth.userGuard,async(req,res)=>{
-    const record = req.params.rid;
+router.post('/recordData',auth.userGuard,async(req,res)=>{
+    //const record = req.params.rid;
     const user = req.user._id;
     const today = new Date().toISOString().substring(0,10);
     const calories = req.user.calorieIngested;
@@ -55,7 +55,7 @@ router.post('/recordData/:rid',auth.userGuard,async(req,res)=>{
     var inside;
 
     try{
-        a = await Record.findOne({_id : record});
+        a = await Record.findOne({account_id : user});
     }   
     catch{
         res.json({success:false, msg:"No record found"});
@@ -78,7 +78,7 @@ router.post('/recordData/:rid',auth.userGuard,async(req,res)=>{
     averageSteps = totalSteps/total_days;
 
     if(validate == 1){
-        Record.findOneAndUpdate({_id : record},{
+        Record.findOneAndUpdate({account_id : user},{
             $set:{
                 "progress.$[inside].steps" : steps,
                 "progress.$[inside].calorie" : calories
@@ -91,7 +91,7 @@ router.post('/recordData/:rid',auth.userGuard,async(req,res)=>{
           }
         )
         .then(()=>{
-            Record.findOneAndUpdate({_id : record},{
+            Record.findOneAndUpdate({account_id : user},{
                 $set:{
                      "averageCalories" : parseInt(averageCalories),
                      "averageSteps" : parseInt(averageSteps)
@@ -110,7 +110,7 @@ router.post('/recordData/:rid',auth.userGuard,async(req,res)=>{
         })
     }
     else{
-        Record.findOneAndUpdate({_id : record},{
+        Record.findOneAndUpdate({account_id : user},{
             $addToSet:{
                 progress:[{
                     steps : steps,
