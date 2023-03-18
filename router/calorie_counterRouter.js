@@ -41,22 +41,28 @@ router.post('/counter', auth.userGuard, async (req, res) => {
                             }
                         }
                     )
-                    dailyfood.findOneAndUpdate({account_id : user},{
-                        $addToSet:{
-                            foodIngested:[{
-                                sauceName : sauceName,
-                                calories : sauce_data.calories
-                            }]
-                        }
+                    .then(()=>{
+                        dailyfood.findOneAndUpdate({account_id : user},{
+                            $addToSet:{
+                                foodIngested:[{
+                                    sauceName : sauceName,
+                                    calories : sauce_data.calories
+                                }]
+                            }
+                        })
+            
+                            .then((data) => {
+                                // console.log(data);
+                                res.json({ success: true, msg: "Success" })
+                            })
+                            .catch((e) => {
+                                res.json({ success: false, msg: e })
+                            })
                     })
-        
-                        .then((data) => {
-                            // console.log(data);
-                            res.json({ success: true, msg: "Success" })
-                        })
-                        .catch((e) => {
-                            res.json({ success: false, msg: e })
-                        })
+                    .catch((e) => {
+                        res.json({ success: false, msg: e });
+                    }
+                    )
                 })
                 .catch((e) => {
                     res.json({ success: false, msg: e });
@@ -111,6 +117,14 @@ router.post('/calorieReset', auth.userGuard, async (req, res) => {
             }
         )
             .then((data) => {
+                dailyfood.remove({}, function (err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    else {
+                        console.log ("Data deleted" );
+                    }
+                })
                 if(a.calorieGoal <= user_calorieIngested && a.stepsGoal <= user_stepWalked){
                     User.findOneAndUpdate({ _id: user },
                         {
@@ -159,6 +173,17 @@ router.get("/calorie/showUser", auth.userGuard,async(req, res) => {
         .then((data) => {
             res.json({ data: data })
         })
+})
+
+router.delete("/calorie/deleteData",auth.userGuard,async(req,res)=>{
+    dailyfood.remove({}, function (err) {
+        if (err) {
+            res.json(err);
+        }
+        else {
+            res.json({ success: true, msg: "Data deleted" });
+        }
+    })
 })
 
 module.exports = router;
