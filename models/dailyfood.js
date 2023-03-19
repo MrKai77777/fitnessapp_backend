@@ -11,9 +11,11 @@ const dailyfood = new mongodb.Schema({
     foodIngested :[{
         sauceName:{
             type: String,
+            default : "N/A"
         },
         calories:{
             type: Number,
+            default : 0
         } 
     }]
 });
