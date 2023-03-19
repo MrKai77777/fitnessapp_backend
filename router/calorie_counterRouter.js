@@ -11,9 +11,31 @@ app.use(express.json());
 
 var sum;
 
-// router.post('/createDBCounter',auth.userGuard,async(req,res)=>{
-//     const user = req.user._id;
-// });
+ router.post('/createDBCounter',auth.userGuard,async(req,res)=>{
+     const user = req.user._id;
+     dailyfood.findOne({account_id : user})
+    .then((data)=>{
+        if(data){
+            res.json({ success : true , msg: "Record already exists" });
+            return;
+        }
+         const firstname = req.user.firstname;
+        // const steps = req.user.stepsWalked;
+        // const calorie = req.user.calorieIngested;
+        // const date = new Date().toISOString().substring(0,10);
+        const food = new dailyfood({
+        account_id : user,
+        firstname : firstname
+    })
+    food.save()
+    .then(()=>{
+        res.json({success :true , msg:"New DB Created"});
+    })
+    .catch((e)=>{
+        res.json({success :false , msg: e});
+    })
+    })
+ });
 
 router.post('/counter', auth.userGuard, async (req, res) => {
     const user = req.user._id;
@@ -88,6 +110,20 @@ router.post('/counter', auth.userGuard, async (req, res) => {
     
 });
 
+router.post('/recordSteps',auth.userGuard,async(req,res)=>{
+    const user = req.user._id;
+    const steps = req.body.steps;
+    User.findOneAndUpdate({_id : user},{
+        stepsWalked : steps
+    })
+    .then(()=>{
+        res.json({success : true , msg:"Steps Recorded"})
+    })
+    .catch(()=>{
+        res.json({success : false, msg : "Error"})
+    })
+})
+
 router.post('/calorieReset', auth.userGuard, async (req, res) => {
     const user = req.user._id;
     const user_calorieIngested = req.user.calorieIngested;
@@ -117,7 +153,7 @@ router.post('/calorieReset', auth.userGuard, async (req, res) => {
             }
         )
             .then((data) => {
-                dailyfood.remove({}, function (err) {
+                dailyfood.deleteMany({},function(err){
                     if (err) {
                         console.log(err);
                     }

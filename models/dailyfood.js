@@ -5,6 +5,9 @@ const dailyfood = new mongodb.Schema({
         type : mongodb.Schema.Types.ObjectId,
         ref : "customer_database"
     },
+    firstname :{
+        type: String
+    },
     foodIngested :[{
         sauceName:{
             type: String,
