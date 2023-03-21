@@ -209,6 +209,9 @@ router.get("/calorie/showUser", auth.userGuard,async(req, res) => {
         .then((data) => {
             res.json({ data: data })
         })
+        .catch((e)=>{
+            res.json({success : false , msg :"No Data Found"})
+        })
 })
 
 router.delete("/calorie/deleteData",auth.userGuard,async(req,res)=>{

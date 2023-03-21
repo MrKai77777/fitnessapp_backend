@@ -54,6 +54,17 @@ router.get("/task/show", (req, res) => {
         })
 })
 
+router.get("/task/showUser",auth.userGuard,async(req,res)=>{
+    const user = req.user._id;
+    Task.find({"include_user.account.account_id" : user})
+    .then((data)=>{
+        res.json({data : data})
+    })
+    .catch(()=>{
+        res.json({success : false, msg : "No Data Found"})
+    })
+})
+
 router.get("/task/showTask", (req, res) => {
     const group = req.body.group;
     Task.findOne({_id : group})
